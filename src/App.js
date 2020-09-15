@@ -1,20 +1,46 @@
-import React, { Component } from 'react';
-import './stylesheets/App.css'
-import { Segment } from 'semantic-ui-react';
+import React, { Component } from "react";
+import "./stylesheets/App.css";
+import { Segment } from "semantic-ui-react";
+import WestworldMap from "./components/WestworldMap";
+import Headquarters from "./components/Headquarters";
 
+const ENDPOINT = "http://localhost:5500";
 
 class App extends Component {
+  state = {
+    hosts: {
+      active: [],
+      inactive: [],
+    },
+    areas: [],
+  };
 
-  // As you go through the components given you'll see a lot of functional components.
-  // But feel free to change them to whatever you want.
-  // It's up to you whether they should be stateful or not.
+  componentDidMount() {
+    fetch(`${ENDPOINT}/areas`)
+      .then((resp) => resp.json())
+      .then((areas) => this.setState({ areas: areas }));
+    fetch(`${ENDPOINT}/hosts`)
+      .then((resp) => resp.json())
+      .then((hosts) =>
+        this.setState({
+          hosts: {
+            active: hosts.filter((host) => !!host.active),
+            inactive: hosts.filter((host) => !host.active),
+          },
+        })
+      );
+  }
 
-  render(){
+  render() {
     return (
-      <Segment id='app'>
-        {/* What components should go here? Check out Checkpoint 1 of the Readme if you're confused */}
+      <Segment id="app">
+        <WestworldMap
+          hosts={this.state.hosts.active}
+          areas={this.state.areas}
+        />
+        <Headquarters hosts={this.state.hosts.inactive} />
       </Segment>
-    )
+    );
   }
 }
 
